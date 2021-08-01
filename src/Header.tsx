@@ -17,10 +17,18 @@ const Logo = styled.div`
   font-weight: bold;
 `
 
-export const Header = ({ className }: { className?: string }) => (
+export const Header = ({
+  filterValue,
+  onFilterChange,
+  className,
+}: {
+  filterValue?: string
+  onFilterChange?(value: string): void
+  className?: string
+}) => (
   <Container className={className}>
     <Logo>Kanban board</Logo>
 
-    <CardFilter />
+    <CardFilter value={filterValue} onChange={onFilterChange} />
   </Container>
 )
