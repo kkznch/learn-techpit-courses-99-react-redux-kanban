@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import produce from 'immer'
 import { Header as _Header } from './Header'
 import { Column } from './Column'
+import { DeleteDialog } from './DeleteDialog'
+import { Overlay as _Overlay } from './Overlay'
 
 const Container = styled.div`
   display: flex;
@@ -37,6 +39,13 @@ const HorizontalScroll = styled.div`
     content: '';
   }
 `
+
+const Overlay = styled(_Overlay)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
 export const App = () => {
   const [filterValue, setFilterValue] = useState('')
   const [columns, setColumns] = useState([
@@ -109,6 +118,24 @@ export const App = () => {
     )
   }
 
+  const [deletingCardID, setDeletingCardID] = useState<string | undefined>()
+  const deleteCard = () => {
+    const cardID = deletingCardID
+    if (!cardID) return
+
+    setDeletingCardID(undefined)
+
+    type Columns = typeof columns
+    setColumns(
+      produce((columns: Columns) => {
+        const column = columns.find(col => col.cards.some(c => c.id === cardID))
+        if (!column) return
+
+        column.cards = column.cards.filter(c => c.id !== cardID)
+      }),
+    )
+  }
+
   return (
     <Container>
       <Header filterValue={filterValue} onFilterChange={setFilterValue} />
@@ -123,10 +150,19 @@ export const App = () => {
               cards={cards}
               onCardDragStart={cardID => setDraggingCardID(cardID)}
               onCardDrop={entered => dropCardTo(entered ?? columnID)}
+              onCardDeleteClick={cardID => setDeletingCardID(cardID)}
             />
           ))}
         </HorizontalScroll>
       </MainArea>
+      {deletingCardID && (
+        <Overlay onClick={() => setDeletingCardID(undefined)}>
+          <DeleteDialog
+            onConfirm={deleteCard}
+            onCancel={() => setDeletingCardID(undefined)}
+          />
+        </Overlay>
+      )}
     </Container>
   )
 }

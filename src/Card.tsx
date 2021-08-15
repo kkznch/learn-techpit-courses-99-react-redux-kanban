@@ -57,10 +57,12 @@ export const Card = ({
   text,
   onDragStart,
   onDragEnd,
+  onDeleteClick,
 }: {
   text?: string
   onDragStart?(): void
   onDragEnd?(): void
+  onDeleteClick?(): void
 }) => {
   const [drag, setDrag] = useState(false)
 
@@ -86,7 +88,7 @@ export const Card = ({
           </Link>
         ),
       )}
-      <DeleteButton />
+      <DeleteButton onClick={onDeleteClick} />
     </Container>
   )
 }
